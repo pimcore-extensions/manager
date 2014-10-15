@@ -1,0 +1,2 @@
+
+ExtensionManager Plugin works!
