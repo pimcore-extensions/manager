@@ -3,44 +3,26 @@
 
 class ExtensionManager_Plugin  extends Pimcore_API_Plugin_Abstract implements Pimcore_API_Plugin_Interface {
 
-    public function init() {
-        // register your events here
+	protected static $installedFileName = "/var/config/.extensionManager";
 
-        // using anonymous function
-        Pimcore::getEventManager()->attach("document.postAdd", function ($event) {
-            // do something
-            $document = $event->getTarget();
-        });
-
-        // using methods
-        Pimcore::getEventManager()->attach("document.postUpdate", array($this, "handleDocument"));
-
-        // for more information regarding events, please visit:
-        // http://www.pimcore.org/wiki/display/PIMCORE/Event+API+%28EventManager%29+since+2.1.1
-        // http://framework.zend.com/manual/1.12/de/zend.event-manager.event-manager.html
-        // http://www.pimcore.org/wiki/pages/viewpage.action?pageId=12124202
-
+    public static function isInstalled()
+    {
+        return file_exists(PIMCORE_WEBSITE_PATH . self::$installedFileName);
+    }
+    
+    public function preDispatch($e)
+    {
+        include_once(PIMCORE_PLUGINS_PATH . '/ExtensionManager/vendor/autoload.php');
     }
 
-    public function handleDocument ($event) {
-        // do something
-        $document = $event->getTarget();
+    public static function install()
+    {
+        touch(PIMCORE_WEBSITE_PATH . self::$installedFileName);
     }
-
-	public static function install (){
-        // implement your own logic here
-        return true;
-	}
-	
-	public static function uninstall (){
-        // implement your own logic here
-        return true;
-	}
-
-	public static function isInstalled () {
-        // implement your own logic here
-        return true;
-	}
-
+    
+    public static function uninstall()
+    {
+        unlink(PIMCORE_WEBSITE_PATH . self::$installedFileName);
+    }
 
 }
