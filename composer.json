@@ -15,6 +15,7 @@
     ],
     "require": {
       "pimcore/installer-plugin": ">=1",
-      "composer/composer" : "1.0.0-alpha8"
+      "composer/composer" : "1.0.0-alpha8",
+      "knplabs/packagist-api": "1.*@dev"
     }
 }  
