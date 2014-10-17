@@ -15,10 +15,10 @@ pimcore.plugin.extensionmanager.startup = Class.create(pimcore.plugin.admin, {
             if(record.iconCls == 'pimcore_icon_extensionmanager')
                 record.setHandler(function(){
                     try {
-                        pimcore.globalmanager.get("plugin_extensionmanager").activate();
+                        pimcore.globalmanager.get("extensionmanager_admin").activate();
                     }
                     catch (e) {
-                        pimcore.globalmanager.add("plugin_extensionmanager", new pimcore.plugin.extensionmanager.admin());
+                        pimcore.globalmanager.add("extensionmanager_admin", new pimcore.plugin.extensionmanager.admin());
                     }
                 });
         }, this);
