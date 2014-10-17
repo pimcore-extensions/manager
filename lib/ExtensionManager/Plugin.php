@@ -25,4 +25,24 @@ class ExtensionManager_Plugin  extends Pimcore_API_Plugin_Abstract implements Pi
         unlink(PIMCORE_WEBSITE_PATH . self::$installedFileName);
     }
 
+    /**
+     * @return string
+     */
+    public static function getTranslationFileDirectory()
+    {
+        return PIMCORE_PLUGINS_PATH . '/ExtensionManager/static/texts';
+    }
+
+    /**
+     * @param string $language
+     * @return string path to the translation file relative to plugin direcory
+     */
+    public static function getTranslationFile($language)
+    {
+        if (is_file(self::getTranslationFileDirectory() . "/$language.csv")) {
+            return "/ExtensionManager/static/texts/$language.csv";
+        } else {
+            return '/ExtensionManager/static/texts/en.csv';
+        }
+    }
 }

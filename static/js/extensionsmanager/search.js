@@ -1,6 +1,6 @@
 
-pimcore.registerNS("pimcore.plugin.extensionsmanager.search");
-pimcore.plugin.extensionsmanager.search = Class.create({
+pimcore.registerNS("pimcore.plugin.extensionmanager.search");
+pimcore.plugin.extensionmanager.search = Class.create({
 
     initialize: function () {
         this.getTabPanel();
@@ -17,7 +17,7 @@ pimcore.plugin.extensionsmanager.search = Class.create({
             this.panel = new Ext.Panel({
                 id: "plugin_extensionmanager_search",
                 title: t("download_extension"),
-                iconCls: "pimcore_icon_extensionmanager_download",
+                iconCls: "pimcore_icon_plugin_add",
                 border: false,
                 layout: "fit",
                 closable:true,
@@ -113,11 +113,6 @@ pimcore.plugin.extensionsmanager.search = Class.create({
     },
 
     reload: function () {
-
-        if(!this.checkLiveConnect()) {
-            return;
-        }
-
         this.store.reload();
     },
 
@@ -164,7 +159,7 @@ pimcore.plugin.extensionsmanager.search = Class.create({
         
         if(updateInfo.success)
         {
-            message = "plugin_extensionmanager_install_success";
+            message = t("plugin_extensionmanager_install_success");
         }
         else
             message = updateInfo.message;

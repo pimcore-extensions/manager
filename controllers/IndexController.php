@@ -77,6 +77,6 @@ class ExtensionManager_IndexController extends Pimcore_Controller_Action_Admin {
             $this->_helper->json(array("success" => true));
         }
         else
-            return $this->_helper->json(array("success" => false, "message" => "couldnt write composer json"));
+            return $this->_helper->json(array("success" => false, "message" => "couldn't write composer json"));
     }
 }
