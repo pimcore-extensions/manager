@@ -1,10 +1,10 @@
 {
-    "name": "pfaffenbauer/extension-manager",
+    "name": "pimcore-extensions/manager",
     "type": "pimcore-plugin",
     "license": "Simple BSD",
     "description": "Helps you manage your Pimcore Extensions with Composer",
-    "keywords": ["pimcore","extensionmanager"],
-    "homepage": "https://github.com/dpfaffenbauer/pimcore-extensionmanager",
+    "keywords": ["pimcore", "extensionmanager"],
+    "homepage": "https://github.com/pimcore-extensions/manager",
     "authors": [
         {
             "name": "Dominik Pfaffenbauer",
@@ -14,8 +14,8 @@
         }
     ],
     "require": {
-      "pimcore/installer-plugin": ">=1",
-      "composer/composer" : "1.0.0-alpha8",
-      "knplabs/packagist-api": "1.*@dev"
+        "pimcore/installer-plugin": ">=1",
+        "composer/composer": "1.0.*@dev",
+        "knplabs/packagist-api": "1.*@dev"
     }
-}  
+}
