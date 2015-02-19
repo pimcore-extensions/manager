@@ -12,6 +12,7 @@ class Manager_Composer
 
         if(is_file($composerFile))
             return $composerFile;
+            
         return false;
     }
 
@@ -37,19 +38,41 @@ class Manager_Composer
 
     public static function update()
     {
-        // change out of the webroot so that the vendors file is not created in
-        // a place that will be visible to the intahwebz
-        chdir(PIMCORE_DOCUMENT_ROOT);
+        $jobId = uniqid();
+        $logFile = PIMCORE_SYSTEM_TEMP_DIRECTORY . "/composer_update_" . $jobId . ".txt";
+        $pidFile = PIMCORE_SYSTEM_TEMP_DIRECTORY . "/composer_update_" . $jobId . ".pid";
+        
+        if(is_file($logFile))
+            unlink($logFile);
+        
+        $pid = Pimcore_Tool_Console::execInBackground(Pimcore_Tool_Console::getPhpCli() . " " . PIMCORE_PLUGINS_PATH . "/Manager/cli/composer-update.php " . $jobId, $logFile);
 
-        putenv('COMPOSER_HOME=' . PIMCORE_DOCUMENT_ROOT . '/vendor/composer/composer/bin/composer');
+        file_put_contents($pidFile, $pid);
+        
+        return $jobId;
+    }
+    
+    public static function getStatus($jobId)
+    {
+        $pidFile = PIMCORE_SYSTEM_TEMP_DIRECTORY . "/composer_update_" . $jobId . ".pid";
 
-        //Create the commands
-        $input = new Symfony\Component\Console\Input\ArrayInput(array('command' => 'update'));
-        //$output = new Symfony\Component\Console\Output\StreamOutput(fopen('php://output','w'));
+        if(is_file($pidFile))
+        {
+            return "running";
+        }
+        
+        return "finished";
+    }
+    
+    public static function getLogFile($jobId)
+    {
+        $file = PIMCORE_SYSTEM_TEMP_DIRECTORY . "/composer_update_" . $jobId . ".txt";
 
-        //Create the application and run it with the commands
-        $application = new Composer\Console\Application();
-        $application->setAutoExit(false);
-        $application->run($input);
+        if(is_file($file))
+        {
+            return nl2br(file_get_contents($file));
+        }
+        
+        return null;
     }
 }
