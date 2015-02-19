@@ -16,6 +16,7 @@
     "require": {
         "pimcore/installer-plugin": ">=1",
         "composer/composer": "1.0.*@dev",
+        "symfony/console": "~2.6.0",
         "knplabs/packagist-api": "1.*@dev"
     }
 }
