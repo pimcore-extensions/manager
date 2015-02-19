@@ -45,11 +45,11 @@ class Manager_Composer
         
         //Create the commands
         $input = new Symfony\Component\Console\Input\ArrayInput(array('command' => 'update'));
-        $output = new Symfony\Component\Console\Output\StreamOutput(fopen('php://output','w'));
+        //$output = new Symfony\Component\Console\Output\StreamOutput(fopen('php://output','w'));
         
         //Create the application and run it with the commands
         $application = new Composer\Console\Application();
         $application->setAutoExit(false);
-        $application->run($input, $output);
+        $application->run($input);
     }
 }
