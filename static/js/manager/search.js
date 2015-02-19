@@ -1,6 +1,6 @@
 
-pimcore.registerNS("pimcore.plugin.extensionmanager.search");
-pimcore.plugin.extensionmanager.search = Class.create({
+pimcore.registerNS("pimcore.plugin.manager.search");
+pimcore.plugin.manager.search = Class.create({
 
     initialize: function () {
         this.getTabPanel();
@@ -8,14 +8,14 @@ pimcore.plugin.extensionmanager.search = Class.create({
 
     activate: function () {
         var tabPanel = Ext.getCmp("pimcore_panel_tabs");
-        tabPanel.activate("plugin_extensionmanager_search");
+        tabPanel.activate("plugin_manager_search");
     },
 
     getTabPanel: function () {
 
         if (!this.panel) {
             this.panel = new Ext.Panel({
-                id: "plugin_extensionmanager_search",
+                id: "plugin_manager_search",
                 title: t("download_extension"),
                 iconCls: "pimcore_icon_plugin_add",
                 border: false,
@@ -26,11 +26,11 @@ pimcore.plugin.extensionmanager.search = Class.create({
 
             var tabPanel = Ext.getCmp("pimcore_panel_tabs");
             tabPanel.add(this.panel);
-            tabPanel.activate("plugin_extensionmanager_search");
+            tabPanel.activate("plugin_manager_search");
 
 
             this.panel.on("destroy", function () {
-                pimcore.globalmanager.remove("plugin_extensionmanager_search");
+                pimcore.globalmanager.remove("plugin_manager_search");
             }.bind(this));
 
             pimcore.layout.refresh();
@@ -43,7 +43,7 @@ pimcore.plugin.extensionmanager.search = Class.create({
 
         this.store = new Ext.data.JsonStore({
             id: 'plugin_extensions',
-            url: '/plugin/ExtensionManager',
+            url: '/plugin/Manager',
             restful: false,
             root: "packages",
             fields: ["name","description", "url", "downloads", "favers", "repository"]
@@ -138,13 +138,13 @@ pimcore.plugin.extensionmanager.search = Class.create({
         this.downloadWindow.removeAll();
         this.downloadWindow.add({
             bodyStyle: "padding:10px;",
-            html: t("plugin_extensionmanager_install")
+            html: t("plugin_manager_install")
         });
 
         this.downloadWindow.doLayout();
 
         Ext.Ajax.request({
-            url: "/plugin/ExtensionManager/index/install",
+            url: "/plugin/Manager/index/install",
             params: {
                 name: rec.get("name")
             },
@@ -159,7 +159,7 @@ pimcore.plugin.extensionmanager.search = Class.create({
         
         if(updateInfo.success)
         {
-            message = t("plugin_extensionmanager_install_success");
+            message = t("plugin_manager_install_success");
         }
         else
             message = updateInfo.message;

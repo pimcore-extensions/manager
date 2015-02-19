@@ -1,9 +1,9 @@
 <?php
 
 
-class ExtensionManager_Plugin  extends Pimcore_API_Plugin_Abstract implements Pimcore_API_Plugin_Interface {
+class Manager_Plugin  extends Pimcore_API_Plugin_Abstract implements Pimcore_API_Plugin_Interface {
 
-	protected static $installedFileName = "/var/config/.extensionManager";
+	protected static $installedFileName = "/var/config/.manager";
 
     public static function isInstalled()
     {
@@ -12,7 +12,7 @@ class ExtensionManager_Plugin  extends Pimcore_API_Plugin_Abstract implements Pi
     
     public function preDispatch($e)
     {
-        include_once(PIMCORE_PLUGINS_PATH . '/ExtensionManager/vendor/autoload.php');
+        include_once(PIMCORE_PLUGINS_PATH . '/Manager/vendor/autoload.php');
     }
 
     public static function install()
@@ -30,7 +30,7 @@ class ExtensionManager_Plugin  extends Pimcore_API_Plugin_Abstract implements Pi
      */
     public static function getTranslationFileDirectory()
     {
-        return PIMCORE_PLUGINS_PATH . '/ExtensionManager/static/texts';
+        return PIMCORE_PLUGINS_PATH . '/Manager/static/texts';
     }
 
     /**
@@ -40,9 +40,9 @@ class ExtensionManager_Plugin  extends Pimcore_API_Plugin_Abstract implements Pi
     public static function getTranslationFile($language)
     {
         if (is_file(self::getTranslationFileDirectory() . "/$language.csv")) {
-            return "/ExtensionManager/static/texts/$language.csv";
+            return "/Manager/static/texts/$language.csv";
         } else {
-            return '/ExtensionManager/static/texts/en.csv';
+            return '/Manager/static/texts/en.csv';
         }
     }
 }

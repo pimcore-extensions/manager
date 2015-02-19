@@ -1,7 +1,7 @@
 <?php
 
 
-class ExtensionManager_Composer
+class Manager_Composer
 {
     public static function getComposerFile()
     {
@@ -41,12 +41,15 @@ class ExtensionManager_Composer
         // a place that will be visible to the intahwebz
         chdir(PIMCORE_DOCUMENT_ROOT);
         
+        putenv('COMPOSER_HOME=' . PIMCORE_DOCUMENT_ROOT . '/vendor/composer/composer/bin/composer');
+        
         //Create the commands
         $input = new Symfony\Component\Console\Input\ArrayInput(array('command' => 'update'));
+        $output = new Symfony\Component\Console\Output\StreamOutput(fopen('php://output','w'));
         
         //Create the application and run it with the commands
         $application = new Composer\Console\Application();
         $application->setAutoExit(false);
-        $application->run($input);
+        $application->run($input, $output);
     }
 }

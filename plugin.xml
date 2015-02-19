@@ -3,7 +3,7 @@
 		<plugin>
 
             <!-- the plugin name [A-Za-z_] -->
-            <pluginName>ExtensionManager</pluginName>
+            <pluginName>Manager</pluginName>
 
             <!-- a short description -->
 			<pluginDescription><![CDATA[]]></pluginDescription>
@@ -13,32 +13,32 @@
             <pluginRevision>1</pluginRevision>
             <pluginBuildTimestamp>0</pluginBuildTimestamp>
 
-            <!-- put in the URL for the plugin configuration eg. /plugin/ExtensionManager/admin/index -->
+            <!-- put in the URL for the plugin configuration eg. /plugin/Manager/admin/index -->
             <pluginIframeSrc></pluginIframeSrc>
 
             <!-- className of the plugin which extends Pimcore_API_Plugin_Abstract-->
-			<pluginClassName>ExtensionManager_Plugin</pluginClassName>
+			<pluginClassName>Manager_Plugin</pluginClassName>
 
             <!-- include paths relative to plugin-directory -->
 			<pluginIncludePaths>
-				<path>/ExtensionManager/lib</path>
+				<path>/Manager/lib</path>
 			</pluginIncludePaths>
 
 			<!-- namespaces to register with autoloader-->
 			<pluginNamespaces>
-				<namespace>ExtensionManager</namespace>
+				<namespace>Manager</namespace>
 			</pluginNamespaces>
 
 			<!-- js files with path relative to plugin-directory -->
 			<pluginJsPaths>
-                <path>/plugins/ExtensionManager/static/js/startup.js</path>
-                <path>/plugins/ExtensionManager/static/js/extensionsmanager/admin.js</path>
-                <path>/plugins/ExtensionManager/static/js/extensionsmanager/search.js</path>
+                <path>/plugins/Manager/static/js/startup.js</path>
+                <path>/plugins/Manager/static/js/manager/admin.js</path>
+                <path>/plugins/Manager/static/js/manager/search.js</path>
 			</pluginJsPaths>
 
 			<!-- css files with path relative to plugin-directory -->
 			<pluginCssPaths>
-                <path>/plugins/ExtensionManager/static/css/example.css</path>
+                <!-- <path>/plugins/Manager/static/css/example.css</path> -->
 			</pluginCssPaths>
 		</plugin>
 </zend-config>

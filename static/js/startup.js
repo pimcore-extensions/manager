@@ -1,8 +1,8 @@
-pimcore.registerNS("pimcore.plugin.extensionmanager.startup");
+pimcore.registerNS("pimcore.plugin.manager.startup");
 
-pimcore.plugin.extensionmanager.startup = Class.create(pimcore.plugin.admin, {
+pimcore.plugin.manager.startup = Class.create(pimcore.plugin.admin, {
     getClassName: function() {
-        return "pimcore.plugin.extensionmanager.startup";
+        return "pimcore.plugin.manager.startup";
     },
 
     initialize: function() {
@@ -15,15 +15,15 @@ pimcore.plugin.extensionmanager.startup = Class.create(pimcore.plugin.admin, {
             if(record.iconCls == 'pimcore_icon_extensionmanager')
                 record.setHandler(function(){
                     try {
-                        pimcore.globalmanager.get("extensionmanager_admin").activate();
+                        pimcore.globalmanager.get("manager_admin").activate();
                     }
                     catch (e) {
-                        pimcore.globalmanager.add("extensionmanager_admin", new pimcore.plugin.extensionmanager.admin());
+                        pimcore.globalmanager.add("manager_admin", new pimcore.plugin.manager.admin());
                     }
                 });
         }, this);
     }
 });
 
-var extensionmanagerPlugin = new pimcore.plugin.extensionmanager.startup();
+var managerPlugin = new pimcore.plugin.manager.startup();
 

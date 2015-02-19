@@ -1,7 +1,7 @@
 <?php
 
 
-class ExtensionManager_IndexController extends Pimcore_Controller_Action_Admin {
+class Manager_IndexController extends Pimcore_Controller_Action_Admin {
     
     public function indexAction () {
 
@@ -60,7 +60,7 @@ class ExtensionManager_IndexController extends Pimcore_Controller_Action_Admin {
             return $this->_helper->json(array("success" => false, "message" => "no version for package with name '$name' not found"));
             
             
-        $config = ExtensionManager_Composer::getComposerConfiguration();
+        $config = Manager_Composer::getComposerConfiguration();
         
         if(!$config)
             $this->_helper->json(array("success" => false, "message" => "no composer json found"));
@@ -70,9 +70,9 @@ class ExtensionManager_IndexController extends Pimcore_Controller_Action_Admin {
         
         $config['require'][$name] = $version->getVersion();
         
-        if(ExtensionManager_Composer::writeComposerConfiguration($config))
+        if(Manager_Composer::writeComposerConfiguration($config))
         {
-           ExtensionManager_Composer::update();
+           Manager_Composer::update();
             
             $this->_helper->json(array("success" => true));
         }
