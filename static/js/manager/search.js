@@ -148,26 +148,58 @@ pimcore.plugin.manager.search = Class.create({
             params: {
                 name: rec.get("name")
             },
-            success: this.downloadDone.bind(this)
+            success: this.downloadStarted.bind(this)
         });
     },
 
-    downloadDone: function (transport) 
+    downloadStarted: function (transport) 
     {
         var updateInfo = Ext.decode(transport.responseText);
         var message;
         
         if(updateInfo.success)
         {
-            message = t("plugin_manager_install_success");
+            message = t("plugin_manager_download_started");
+            
+            this.jobId = updateInfo.jobId;
+            
+            window.setTimeout(this.fetchStatus.bind(this), 5000);
         }
         else
             message = updateInfo.message;
-            
+    },
+    
+    fetchStatus : function()
+    {
+        Ext.Ajax.request({
+            url: "/plugin/Manager/index/status",
+            params: {
+                jobId: this.jobId
+            },
+            success: this.newStatus.bind(this)
+        });
+    },
+    
+    newStatus : function(transport)
+    {
+        var status = Ext.decode(transport.responseText);
+        
+        if(status.status == "running")
+        {
+            window.setTimeout(this.fetchStatus.bind(this), 5000);
+        }
+        else
+        {
+            this.downloadFinished(status.logFile);
+        }
+    },
+    
+    downloadFinished: function(log)
+    {
         this.downloadWindow.removeAll();
         this.downloadWindow.add({
             bodyStyle: "padding: 20px;",
-            html: message,
+            html: log,
             buttons: [{
                 text: t("close"),
                 iconCls: "pimcore_icon_apply",

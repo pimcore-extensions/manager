@@ -70,20 +70,35 @@ class Manager_IndexController extends Pimcore_Controller_Action_Admin {
 
         $config['require'][$name] = $version->getVersion();
 
-        if(!Manager_Composer::writeComposerConfiguration($config)) {
+        if(!Manager_Composer::writeComposerConfiguration($config)) 
+        {
             return $this->_helper->json(array(
                 'success' => false,
                 'message' => 'composer.json is not writable, please check permissions'));
         }
 
         try {
-            Manager_Composer::update();
-        } catch (Exception $e) {
+            $jobId = Manager_Composer::update();
+            
+            return $this->_helper->json(array("success" => true, "jobId" => $jobId));
+        } 
+        catch (Exception $e) 
+        {
             return $this->_helper->json(array(
                 'success' => false,
                 'message' => $e->getMessage()));
         }
 
-        return $this->_helper->json(array("success" => true));
+        return $this->_helper->json(array("success" => false));
+    }
+    
+    public function statusAction()
+    {
+        $jobId = $this->getParam("jobId");
+        
+        $status = Manager_Composer::getStatus($jobId);
+        $logFile = Manager_Composer::getLogFile($jobId);
+        
+        return $this->_helper->json(array("status" => $status, "logFile" => $logFile));
     }
 }
