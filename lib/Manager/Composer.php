@@ -7,9 +7,9 @@ class Manager_Composer
     {
         // first check composer one level above - as it's recommended in pimcore documentation:
         // https://www.pimcore.org/wiki/display/PIMCORE3/Extension+management+using+Composer
-        $composerFile = PIMCORE_DOCUMENT_ROOT . '/../composer.json';
+        $composerFile = realpath(PIMCORE_DOCUMENT_ROOT . '/../composer.json');
 
-        if (!is_file($composerFile))
+        if (!$composerFile || !is_file($composerFile))
             $composerFile = PIMCORE_DOCUMENT_ROOT . '/composer.json';
 
         if (is_file($composerFile))
@@ -33,7 +33,8 @@ class Manager_Composer
         $file = self::getComposerFile();
 
         if ($file && is_writable($file))
-            return file_put_contents($file, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            return file_put_contents($file,
+                json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
         return false;
     }
@@ -41,40 +42,47 @@ class Manager_Composer
     public static function update()
     {
         $jobId = uniqid();
-        $logFile = PIMCORE_SYSTEM_TEMP_DIRECTORY . "/composer_update_" . $jobId . ".txt";
-        $pidFile = PIMCORE_SYSTEM_TEMP_DIRECTORY . "/composer_update_" . $jobId . ".pid";
-        
-        if(is_file($logFile))
-            unlink($logFile);
-        
-        $pid = Pimcore_Tool_Console::execInBackground(Pimcore_Tool_Console::getPhpCli() . " " . PIMCORE_PLUGINS_PATH . "/Manager/cli/composer-update.php " . $jobId, $logFile);
+        $logFile = self::getLogFile();
 
-        file_put_contents($pidFile, $pid);
-        
+        if (is_file($logFile))
+            unlink($logFile);
+
+        $cmd = Pimcore_Tool_Console::getPhpCli() . ' ';
+        $cmd .= PIMCORE_PLUGINS_PATH . '/Manager/cli/composer-update.php ' . $jobId;
+        Pimcore_Tool_Console::execInBackground($cmd, $logFile);
+
         return $jobId;
     }
-    
+
     public static function getStatus($jobId)
     {
-        $pidFile = PIMCORE_SYSTEM_TEMP_DIRECTORY . "/composer_update_" . $jobId . ".pid";
+        $pidFile = self::getPidFile($jobId);
 
-        if(is_file($pidFile))
-        {
-            return "running";
+        if (is_file($pidFile)) {
+            return 'running';
         }
-        
-        return "finished";
-    }
-    
-    public static function getLogFile($jobId)
-    {
-        $file = PIMCORE_SYSTEM_TEMP_DIRECTORY . "/composer_update_" . $jobId . ".txt";
 
-        if(is_file($file))
-        {
+        return 'finished';
+    }
+
+    public static function getPidFile($jobId)
+    {
+        return PIMCORE_SYSTEM_TEMP_DIRECTORY . '/composer_update_' . $jobId . '.pid';
+    }
+
+    public static function getLogFile()
+    {
+        return PIMCORE_LOG_DIRECTORY . '/composer_update.log';
+    }
+
+    public static function getLog()
+    {
+        $file = self::getLogFile();
+
+        if (is_file($file)) {
             return nl2br(file_get_contents($file));
         }
-        
+
         return null;
     }
 }
