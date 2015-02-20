@@ -5,13 +5,16 @@ class Manager_Composer
 {
     public static function getComposerFile()
     {
-        $composerFile = PIMCORE_DOCUMENT_ROOT . "/composer.json";
+        // first check composer one level above - as it's recommended in pimcore documentation:
+        // https://www.pimcore.org/wiki/display/PIMCORE3/Extension+management+using+Composer
+        $composerFile = PIMCORE_DOCUMENT_ROOT . '/../composer.json';
 
-        if(!is_file($composerFile))
-            $composerFile = PIMCORE_DOCUMENT_ROOT . "/../composer.json";
+        if (!is_file($composerFile))
+            $composerFile = PIMCORE_DOCUMENT_ROOT . '/composer.json';
 
-        if(is_file($composerFile))
+        if (is_file($composerFile))
             return $composerFile;
+
         return false;
     }
 
@@ -19,7 +22,7 @@ class Manager_Composer
     {
         $file = self::getComposerFile();
 
-        if($file)
+        if ($file)
             return json_decode(file_get_contents($file), true);
 
         return false;
