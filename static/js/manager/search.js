@@ -1,4 +1,4 @@
-pimcore.registerNS("pimcore.plugin.manager.search");
+pimcore.registerNS('pimcore.plugin.manager.search');
 pimcore.plugin.manager.search = Class.create({
 
     initialize: function() {
@@ -6,30 +6,28 @@ pimcore.plugin.manager.search = Class.create({
     },
 
     activate: function() {
-        var tabPanel = Ext.getCmp("pimcore_panel_tabs");
-        tabPanel.activate("plugin_manager_search");
+        var tabPanel = Ext.getCmp('pimcore_panel_tabs');
+        tabPanel.activate('plugin_manager_search');
     },
 
     getTabPanel: function() {
-
         if (!this.panel) {
             this.panel = new Ext.Panel({
-                id: "plugin_manager_search",
-                title: t("download_extension"),
-                iconCls: "pimcore_icon_plugin_add",
+                id: 'plugin_manager_search',
+                title: t('download_extension'),
+                iconCls: 'pimcore_icon_plugin_add',
                 border: false,
-                layout: "fit",
+                layout: 'fit',
                 closable: true,
                 items: [this.getGrid()]
             });
 
-            var tabPanel = Ext.getCmp("pimcore_panel_tabs");
+            var tabPanel = Ext.getCmp('pimcore_panel_tabs');
             tabPanel.add(this.panel);
-            tabPanel.activate("plugin_manager_search");
+            tabPanel.activate('plugin_manager_search');
 
-
-            this.panel.on("destroy", function() {
-                pimcore.globalmanager.remove("plugin_manager_search");
+            this.panel.on('destroy', function() {
+                pimcore.globalmanager.remove('plugin_manager_search');
             }.bind(this));
 
             pimcore.layout.refresh();
@@ -39,21 +37,20 @@ pimcore.plugin.manager.search = Class.create({
     },
 
     getGrid: function() {
-
         this.store = new Ext.data.JsonStore({
             id: 'plugin_extensions',
             url: '/plugin/Manager',
             restful: false,
-            root: "packages",
-            fields: ["name", "description", "url", "downloads", "favers", "repository"]
+            root: 'packages',
+            fields: ['name', 'description', 'url', 'downloads', 'favers', 'repository']
         });
         this.store.load();
 
         var typesColumns = [
-            {header: t("name"), width: 200, sortable: true, dataIndex: 'name'},
+            {header: t('name'), width: 200, sortable: true, dataIndex: 'name'},
             {
-                header: t("description"),
-                id: "extension_description",
+                header: t('description'),
+                id: 'extension_description',
                 width: 200,
                 sortable: true,
                 dataIndex: 'description'
@@ -65,13 +62,11 @@ pimcore.plugin.manager.search = Class.create({
                 items: [{
                     tooltip: t('description'),
                     getClass: function(v, meta, rec) {
-                        return "pimcore_action_column pimcore_icon_layout_region";
+                        return 'pimcore_action_column pimcore_icon_layout_region';
                     },
                     handler: function(grid, rowIndex) {
-
                         var rec = grid.getStore().getAt(rowIndex);
-                        window.open(rec.get("url"));
-
+                        window.open(rec.get('url'));
                     }.bind(this)
                 }]
             },
@@ -81,15 +76,12 @@ pimcore.plugin.manager.search = Class.create({
                 width: 30,
                 items: [{
                     tooltip: t('download'),
-                    getClass: function(v, meta, rec) {
-                        return "pimcore_action_column pimcore_icon_download";
+                    getClass: function() {
+                        return 'pimcore_action_column pimcore_icon_download';
                     },
                     handler: function(grid, rowIndex) {
-
                         var rec = grid.getStore().getAt(rowIndex);
                         this.openDownloadWindow(rec);
-
-
                     }.bind(this)
                 }]
             }
@@ -100,13 +92,13 @@ pimcore.plugin.manager.search = Class.create({
             autoScroll: true,
             store: this.store,
             columns: typesColumns,
-            autoExpandColumn: "extension_description",
+            autoExpandColumn: 'extension_description',
             trackMouseOver: true,
             columnLines: true,
             stripeRows: true,
             tbar: [{
-                text: t("refresh"),
-                iconCls: "pimcore_icon_reload",
+                text: t('refresh'),
+                iconCls: 'pimcore_icon_reload',
                 handler: this.reload.bind(this)
             }],
             viewConfig: {
@@ -124,9 +116,24 @@ pimcore.plugin.manager.search = Class.create({
     openDownloadWindow: function(rec) {
         this.downloadWindow = new Ext.Window({
             modal: true,
+            title: t('plugin_manager_install'),
             width: 500,
-            height: 200,
-            items: [],
+            height: 250,
+            layout: 'fit',
+            closable: false,
+            items: [{
+                bodyStyle: 'padding: 10px;',
+                autoScroll: true,
+                html: ''
+            }],
+            buttons: [{
+                text: t('close'),
+                iconCls: 'pimcore_icon_apply',
+                disabled: true,
+                handler: function() {
+                    this.downloadWindow.close();
+                }.bind(this)
+            }],
             listeners: {
                 close: this.reload.bind(this)
             }
@@ -138,72 +145,47 @@ pimcore.plugin.manager.search = Class.create({
     },
 
     downloadPrepare: function(rec) {
-
-        this.downloadWindow.removeAll();
-        this.downloadWindow.add({
-            bodyStyle: "padding:10px;",
-            html: t("plugin_manager_install")
-        });
-
-        this.downloadWindow.doLayout();
-
         Ext.Ajax.request({
-            url: "/plugin/Manager/index/install",
+            url: '/plugin/Manager/index/install',
             params: {
-                name: rec.get("name")
+                name: rec.get('name')
             },
             success: this.downloadStarted.bind(this)
         });
     },
 
     downloadStarted: function(transport) {
-        var updateInfo = Ext.decode(transport.responseText);
-        var message;
+        var info = Ext.decode(transport.responseText);
 
-        if (updateInfo.success) {
-            message = t("plugin_manager_download_started");
+        if (info.success) {
+            this.jobId = info.jobId;
 
-            this.jobId = updateInfo.jobId;
-
-            window.setTimeout(this.fetchStatus.bind(this), 5000);
+            window.setTimeout(this.fetchStatus.bind(this), 1000);
         }
-        else
-            message = updateInfo.message;
     },
 
     fetchStatus: function() {
         Ext.Ajax.request({
-            url: "/plugin/Manager/index/status",
+            url: '/plugin/Manager/index/status',
             params: {
                 jobId: this.jobId
             },
-            success: this.newStatus.bind(this)
+            success: this.updateStatus.bind(this)
         });
     },
 
-    newStatus: function(transport) {
+    updateStatus: function(transport) {
         var status = Ext.decode(transport.responseText);
 
-        if (status.status == 'running') {
-            window.setTimeout(this.fetchStatus.bind(this), 5000);
-        } else {
-            this.downloadFinished(status.log);
-        }
-    },
+        var log = this.downloadWindow.items.get(0);
+        log.update(status.log);
+        var d = log.body.dom;
+        d.scrollTop = d.scrollHeight - d.offsetHeight;
 
-    downloadFinished: function(log) {
-        this.downloadWindow.removeAll();
-        this.downloadWindow.add({
-            bodyStyle: "padding: 20px;",
-            html: log,
-            buttons: [{
-                text: t("close"),
-                iconCls: "pimcore_icon_apply",
-                handler: function() {
-                    this.downloadWindow.close();
-                }.bind(this)
-            }]
-        });
-        this.downloadWindow.doLayout();
+        if (status.status == 'running') {
+            window.setTimeout(this.fetchStatus.bind(this), 2000);
+        } else {
+            this.downloadWindow.buttons[0].enable();
+        }
     }
 });
