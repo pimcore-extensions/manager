@@ -19,28 +19,7 @@ class Manager_Composer
         return false;
     }
 
-    public static function getComposerConfiguration()
-    {
-        $file = self::getComposerFile();
-
-        if ($file)
-            return json_decode(file_get_contents($file), true);
-
-        return false;
-    }
-
-    public static function writeComposerConfiguration($config)
-    {
-        $file = self::getComposerFile();
-
-        if ($file && is_writable($file))
-            return file_put_contents($file,
-                json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-
-        return false;
-    }
-
-    public static function update()
+    public static function requirePackage($package)
     {
         $jobId = uniqid();
         $logFile = self::getLogFile();
@@ -49,7 +28,8 @@ class Manager_Composer
             unlink($logFile);
 
         $cmd = Pimcore_Tool_Console::getPhpCli() . ' ';
-        $cmd .= PIMCORE_PLUGINS_PATH . '/Manager/cli/composer-update.php ' . $jobId;
+        $cmd .= PIMCORE_PLUGINS_PATH . '/Manager/cli/composer-require.php ';
+        $cmd .= $package . ' ' . $jobId;
         Pimcore_Tool_Console::execInBackground($cmd, $logFile);
 
         return $jobId;
@@ -81,7 +61,9 @@ class Manager_Composer
         $file = self::getLogFile();
 
         if (is_file($file)) {
-            return nl2br(file_get_contents($file));
+            $content = file_get_contents($file);
+            $content = preg_replace('~[[:cntrl:]]+~', "\n", $content);
+            return nl2br($content, false);
         }
 
         return null;
@@ -90,16 +72,21 @@ class Manager_Composer
     public static function postInstall(Event $event)
     {
         echo "Setting permissions for pimcore-extensions/manager... ";
-        $vendorPath = $event->getComposer()->getConfig()->get('vendor-dir');
-        $basePath = dirname($vendorPath);
 
-        include_once($basePath . '/pimcore/cli/startup.php');
+        $config = $event->getComposer()->getConfig();
+        $vendorPath = $config->get('vendor-dir');
+        $basePath = realpath(getcwd());
+        $documentRoot = realpath($basePath . '/' . $config->get('document-root-path'));
+
+        include_once($documentRoot . '/pimcore/cli/startup.php');
 
         chmod(self::getComposerFile(), 0666);
+
         if (!is_file($basePath . '/composer.lock'))
-            @touch($basePath . '/composer.lock');
+            touch($basePath . '/composer.lock');
         chmod($basePath . '/composer.lock', 0666);
 
+        chmod($vendorPath, 0777);
         $iterator = new IteratorIterator(new DirectoryIterator($vendorPath . '/composer'));
         foreach($iterator as $item) {
             if ($item->isFile()) {
@@ -107,7 +94,7 @@ class Manager_Composer
             }
         }
         chmod($vendorPath . '/autoload.php', 0666);
-        chmod($basePath . '/plugins', 0777);
+        chmod($documentRoot . '/plugins', 0777);
         echo "done\n";
     }
 }

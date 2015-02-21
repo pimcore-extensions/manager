@@ -29,13 +29,13 @@ class Manager_IndexController extends Pimcore_Controller_Action_Admin
     public function installAction()
     {
         $name = $this->getParam('name', null);
-        $client = new Packagist\Api\Client();
 
         if (!$name)
             return $this->_helper->json([
                 'success' => false,
                 'message' => 'no package name supplied']);
 
+        $client = new Packagist\Api\Client();
         try {
             $package = $client->get($name);
         } catch (Exception $ex) {
@@ -64,25 +64,8 @@ class Manager_IndexController extends Pimcore_Controller_Action_Admin
                 'success' => false,
                 'message' => "no version for package with name '$name' not found"]);
 
-
-        $config = Manager_Composer::getComposerConfiguration();
-
-        if (!$config)
-            $this->_helper->json(['success' => false, 'message' => 'no composer json found']);
-
-        if (!is_array($config['require']))
-            $config['require'] = [];
-
-        $config['require'][$name] = $version->getVersion();
-
-        if (!Manager_Composer::writeComposerConfiguration($config)) {
-            return $this->_helper->json([
-                'success' => false,
-                'message' => 'composer.json is not writable, please check permissions']);
-        }
-
         try {
-            $jobId = Manager_Composer::update();
+            $jobId = Manager_Composer::requirePackage($name . ':' . $version->getVersion());
 
             return $this->_helper->json(['success' => true, 'jobId' => $jobId]);
         } catch (Exception $e) {
