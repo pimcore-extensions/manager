@@ -26,6 +26,8 @@ class Manager_Composer
 
         if (is_file($logFile))
             unlink($logFile);
+            
+        file_put_contents(self::getPidFile($jobId), $jobId);
 
         $cmd = Pimcore_Tool_Console::getPhpCli() . ' ';
         $cmd .= PIMCORE_PLUGINS_PATH . '/Manager/cli/composer-require.php ';

@@ -13,5 +13,11 @@
             <path>/plugins/Manager/static/js/manager/admin.js</path>
             <path>/plugins/Manager/static/js/manager/search.js</path>
         </pluginJsPaths>
+        <pluginIncludePaths>
+            <path>/Manager/lib</path>
+        </pluginIncludePaths>
+        <pluginNamespaces>
+            <namespace>Manager</namespace>
+        </pluginNamespaces>
     </plugin>
 </zend-config>
