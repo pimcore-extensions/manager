@@ -1,3 +1,6 @@
 "download_extension","Download extensions"
 "plugin_manager_install","Downloading plugin, please wait..."
 "plugin_manager_install_success","Plugin was successfully downloaded. Please refresh extension manager."
+"packagist","Packagist"
+"go_to_packagist","Go to packagist"
+"downloads","Downloads"

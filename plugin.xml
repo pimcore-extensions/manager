@@ -19,5 +19,8 @@
         <pluginNamespaces>
             <namespace>Manager</namespace>
         </pluginNamespaces>
+        <pluginCssPaths>
+            <path>/plugins/Manager/static/css/admin.css</path>
+        </pluginCssPaths>
     </plugin>
 </zend-config>
