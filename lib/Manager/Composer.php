@@ -1,5 +1,6 @@
 <?php
 
+use Composer\Script\Event;
 
 class Manager_Composer
 {
@@ -84,5 +85,29 @@ class Manager_Composer
         }
 
         return null;
+    }
+
+    public static function postInstall(Event $event)
+    {
+        echo "Setting permissions for pimcore-extensions/manager... ";
+        $vendorPath = $event->getComposer()->getConfig()->get('vendor-dir');
+        $basePath = dirname($vendorPath);
+
+        include_once($basePath . '/pimcore/cli/startup.php');
+
+        chmod(self::getComposerFile(), 0666);
+        if (!is_file($basePath . '/composer.lock'))
+            @touch($basePath . '/composer.lock');
+        chmod($basePath . '/composer.lock', 0666);
+
+        $iterator = new IteratorIterator(new DirectoryIterator($vendorPath . '/composer'));
+        foreach($iterator as $item) {
+            if ($item->isFile()) {
+                chmod($item->getPathName(), 0666);
+            }
+        }
+        chmod($vendorPath . '/autoload.php', 0666);
+        chmod($basePath . '/plugins', 0777);
+        echo "done\n";
     }
 }
