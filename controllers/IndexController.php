@@ -1,104 +1,87 @@
 <?php
 
+use Packagist\Api\Result\Package\Version;
 
-class Manager_IndexController extends Pimcore_Controller_Action_Admin {
-
-    public function indexAction () {
-
+class Manager_IndexController extends Pimcore_Controller_Action_Admin
+{
+    public function indexAction()
+    {
         $client = new Packagist\Api\Client();
 
-        $packagistResults =  $client->search("", array("type" => "pimcore-plugin"));
-        $results = array();
+        $results = $client->search('', ['type' => 'pimcore-plugin']);
+        $packages = [];
 
-        foreach($packagistResults as $result)
-        {
-            $results[] = array(
-                "name" => $result->getName(),
-                "description" => $result->getDescription(),
-                "url" => $result->getUrl(),
-                "downloads" => $result->getDownloads(),
-                "favers" => $result->getFavers(),
-                "repository" => $result->getRepository()
-            );
+        /** @var Packagist\Api\Result\Result $result */
+        foreach ($results as $result) {
+            $packages[] = [
+                'name' => $result->getName(),
+                'description' => $result->getDescription(),
+                'url' => $result->getUrl(),
+                'downloads' => $result->getDownloads(),
+                'favers' => $result->getFavers(),
+                'repository' => $result->getRepository()
+            ];
         }
 
-        $this->_helper->json(array("success" => true, "packages" => $results));
+        $this->_helper->json(['success' => true, 'packages' => $packages]);
     }
 
     public function installAction()
     {
-        $name = $this->getParam("name", null);
+        $name = $this->getParam('name', null);
+
+        if (!$name)
+            return $this->_helper->json([
+                'success' => false,
+                'message' => 'no package name supplied']);
+
         $client = new Packagist\Api\Client();
-
-        if(!$name)
-            $this->_helper->json(array("success" => false, "message" => "no package name supplied"));
-
-        try
-        {
+        try {
             $package = $client->get($name);
-        }
-        catch(Exception $ex)
-        {
-            return $this->_helper->json(array("success" => false, "message" => "packagist package with name '$name' not found"));
+        } catch (Exception $ex) {
+            return $this->_helper->json([
+                'success' => false,
+                'message' => "packagist package with name '$name' not found"]);
         }
 
         $versions = $package->getVersions();
 
-        foreach($versions as $version=>$infos)
-        {
-            if($version == "dev-master")
+        $version = null;
+        foreach ($versions as $version => $infos) {
+            // TODO(rafalgalka) check minimum-stability
+            if ($version == 'dev-master')
                 continue;
 
             $version = $versions[$version];
             break;
         }
 
-        if(!$version instanceof Packagist\Api\Result\Package\Version)
+        if (!$version instanceof Version)
             $version = $versions['dev-master'];
 
-        if(!$version instanceof Packagist\Api\Result\Package\Version)
-            return $this->_helper->json(array("success" => false, "message" => "no version for package with name '$name' not found"));
-
-
-        $config = Manager_Composer::getComposerConfiguration();
-
-        if(!$config)
-            $this->_helper->json(array("success" => false, "message" => "no composer json found"));
-
-        if(!is_array($config['require']))
-            $config['require'] = array();
-
-        $config['require'][$name] = $version->getVersion();
-
-        if(!Manager_Composer::writeComposerConfiguration($config)) 
-        {
-            return $this->_helper->json(array(
+        if (!$version instanceof Version)
+            return $this->_helper->json([
                 'success' => false,
-                'message' => 'composer.json is not writable, please check permissions'));
-        }
+                'message' => "no version for package with name '$name' not found"]);
 
         try {
-            $jobId = Manager_Composer::update();
-            
-            return $this->_helper->json(array("success" => true, "jobId" => $jobId));
-        } 
-        catch (Exception $e) 
-        {
-            return $this->_helper->json(array(
-                'success' => false,
-                'message' => $e->getMessage()));
-        }
+            $jobId = Manager_Composer::requirePackage($name . ':' . $version->getVersion());
 
-        return $this->_helper->json(array("success" => false));
+            return $this->_helper->json(['success' => true, 'jobId' => $jobId]);
+        } catch (Exception $e) {
+            return $this->_helper->json([
+                'success' => false,
+                'message' => $e->getMessage()]);
+        }
     }
-    
+
     public function statusAction()
     {
-        $jobId = $this->getParam("jobId");
-        
+        $jobId = $this->getParam('jobId');
+
         $status = Manager_Composer::getStatus($jobId);
-        $logFile = Manager_Composer::getLogFile($jobId);
-        
-        return $this->_helper->json(array("status" => $status, "logFile" => $logFile));
+        $log = Manager_Composer::getLog();
+
+        return $this->_helper->json(['status' => $status, 'log' => $log]);
     }
 }

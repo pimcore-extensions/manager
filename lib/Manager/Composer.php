@@ -1,78 +1,100 @@
 <?php
 
+use Composer\Script\Event;
 
 class Manager_Composer
 {
     public static function getComposerFile()
     {
-        $composerFile = PIMCORE_DOCUMENT_ROOT . "/composer.json";
+        // first check composer one level above - as it's recommended in pimcore documentation:
+        // https://www.pimcore.org/wiki/display/PIMCORE3/Extension+management+using+Composer
+        $composerFile = realpath(PIMCORE_DOCUMENT_ROOT . '/../composer.json');
 
-        if(!is_file($composerFile))
-            $composerFile = PIMCORE_DOCUMENT_ROOT . "/../composer.json";
+        if (!$composerFile || !is_file($composerFile))
+            $composerFile = PIMCORE_DOCUMENT_ROOT . '/composer.json';
 
-        if(is_file($composerFile))
+        if (is_file($composerFile))
             return $composerFile;
-            
-        return false;
-    }
-
-    public static function getComposerConfiguration()
-    {
-        $file = self::getComposerFile();
-
-        if($file)
-            return json_decode(file_get_contents($file), true);
 
         return false;
     }
 
-    public static function writeComposerConfiguration($config)
-    {
-        $file = self::getComposerFile();
-
-        if ($file && is_writable($file))
-            return file_put_contents($file, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-
-        return false;
-    }
-
-    public static function update()
+    public static function requirePackage($package)
     {
         $jobId = uniqid();
-        $logFile = PIMCORE_SYSTEM_TEMP_DIRECTORY . "/composer_update_" . $jobId . ".txt";
-        $pidFile = PIMCORE_SYSTEM_TEMP_DIRECTORY . "/composer_update_" . $jobId . ".pid";
-        
-        if(is_file($logFile))
-            unlink($logFile);
-        
-        $pid = Pimcore_Tool_Console::execInBackground(Pimcore_Tool_Console::getPhpCli() . " " . PIMCORE_PLUGINS_PATH . "/Manager/cli/composer-update.php " . $jobId, $logFile);
+        $logFile = self::getLogFile();
 
-        file_put_contents($pidFile, $pid);
-        
+        if (is_file($logFile))
+            unlink($logFile);
+
+        $cmd = Pimcore_Tool_Console::getPhpCli() . ' ';
+        $cmd .= PIMCORE_PLUGINS_PATH . '/Manager/cli/composer-require.php ';
+        $cmd .= $package . ' ' . $jobId;
+        Pimcore_Tool_Console::execInBackground($cmd, $logFile);
+
         return $jobId;
     }
-    
+
     public static function getStatus($jobId)
     {
-        $pidFile = PIMCORE_SYSTEM_TEMP_DIRECTORY . "/composer_update_" . $jobId . ".pid";
+        $pidFile = self::getPidFile($jobId);
 
-        if(is_file($pidFile))
-        {
-            return "running";
+        if (is_file($pidFile)) {
+            return 'running';
         }
-        
-        return "finished";
+
+        return 'finished';
     }
-    
-    public static function getLogFile($jobId)
-    {
-        $file = PIMCORE_SYSTEM_TEMP_DIRECTORY . "/composer_update_" . $jobId . ".txt";
 
-        if(is_file($file))
-        {
-            return nl2br(file_get_contents($file));
+    public static function getPidFile($jobId)
+    {
+        return PIMCORE_SYSTEM_TEMP_DIRECTORY . '/composer_update_' . $jobId . '.pid';
+    }
+
+    public static function getLogFile()
+    {
+        return PIMCORE_LOG_DIRECTORY . '/composer_update.log';
+    }
+
+    public static function getLog()
+    {
+        $file = self::getLogFile();
+
+        if (is_file($file)) {
+            $content = file_get_contents($file);
+            $content = preg_replace('~[[:cntrl:]]+~', "\n", $content);
+            return nl2br($content, false);
         }
-        
+
         return null;
+    }
+
+    public static function postInstall(Event $event)
+    {
+        echo "Setting permissions for pimcore-extensions/manager... ";
+
+        $config = $event->getComposer()->getConfig();
+        $vendorPath = $config->get('vendor-dir');
+        $basePath = realpath(getcwd());
+        $documentRoot = realpath($basePath . '/' . $config->get('document-root-path'));
+
+        include_once($documentRoot . '/pimcore/cli/startup.php');
+
+        chmod(self::getComposerFile(), 0666);
+
+        if (!is_file($basePath . '/composer.lock'))
+            touch($basePath . '/composer.lock');
+        chmod($basePath . '/composer.lock', 0666);
+
+        chmod($vendorPath, 0777);
+        $iterator = new IteratorIterator(new DirectoryIterator($vendorPath . '/composer'));
+        foreach($iterator as $item) {
+            if ($item->isFile()) {
+                chmod($item->getPathName(), 0666);
+            }
+        }
+        chmod($vendorPath . '/autoload.php', 0666);
+        chmod($documentRoot . '/plugins', 0777);
+        echo "done\n";
     }
 }
