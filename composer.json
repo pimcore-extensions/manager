@@ -11,6 +11,12 @@
             "email": "dominik@pfaffenbauer.at",
             "homepage": "http://www.pfaffenbauer.at/",
             "role": "Developer"
+        },
+        {
+            "name": "Rafal Galka",
+            "email": "rafal.galka@modernweb.pl",
+            "homepage": "http://www.modernweb.pl/",
+            "role": "Developer"
         }
     ],
     "require": {
@@ -18,5 +24,8 @@
         "composer/composer": "1.0.*@dev",
         "symfony/console": "~2.6.0",
         "knplabs/packagist-api": "1.*@dev"
+    },
+    "autoload": {
+        "psr-0": {"Manager_": "lib/"}
     }
 }

@@ -1,44 +1,23 @@
 <?xml version="1.0"?>
 <zend-config xmlns:zf="http://framework.zend.com/xml/zend-config-xml/1.0/">
-		<plugin>
-
-            <!-- the plugin name [A-Za-z_] -->
-            <pluginName>Manager</pluginName>
-
-            <!-- a short description -->
-			<pluginDescription><![CDATA[]]></pluginDescription>
-
-            <!-- meta data -->
-            <pluginVersion>1.0</pluginVersion>
-            <pluginRevision>1</pluginRevision>
-            <pluginBuildTimestamp>0</pluginBuildTimestamp>
-
-            <!-- put in the URL for the plugin configuration eg. /plugin/Manager/admin/index -->
-            <pluginIframeSrc></pluginIframeSrc>
-
-            <!-- className of the plugin which extends Pimcore_API_Plugin_Abstract-->
-			<pluginClassName>Manager_Plugin</pluginClassName>
-
-            <!-- include paths relative to plugin-directory -->
-			<pluginIncludePaths>
-				<path>/Manager/lib</path>
-			</pluginIncludePaths>
-
-			<!-- namespaces to register with autoloader-->
-			<pluginNamespaces>
-				<namespace>Manager</namespace>
-			</pluginNamespaces>
-
-			<!-- js files with path relative to plugin-directory -->
-			<pluginJsPaths>
-                <path>/plugins/Manager/static/js/startup.js</path>
-                <path>/plugins/Manager/static/js/manager/admin.js</path>
-                <path>/plugins/Manager/static/js/manager/search.js</path>
-			</pluginJsPaths>
-
-			<!-- css files with path relative to plugin-directory -->
-			<pluginCssPaths>
-                <!-- <path>/plugins/Manager/static/css/example.css</path> -->
-			</pluginCssPaths>
-		</plugin>
+    <plugin>
+        <pluginName>Manager</pluginName>
+        <pluginNiceName>Pimcore Extension Manager</pluginNiceName>
+        <pluginDescription><![CDATA[
+            Helps you manage your Pimcore Extensions with Composer
+        ]]></pluginDescription>
+        <pluginVersion>0.1.3</pluginVersion>
+        <pluginClassName>Manager_Plugin</pluginClassName>
+        <pluginJsPaths>
+            <path>/plugins/Manager/static/js/startup.js</path>
+            <path>/plugins/Manager/static/js/manager/admin.js</path>
+            <path>/plugins/Manager/static/js/manager/search.js</path>
+        </pluginJsPaths>
+        <pluginIncludePaths>
+            <path>/Manager/lib</path>
+        </pluginIncludePaths>
+        <pluginNamespaces>
+            <namespace>Manager</namespace>
+        </pluginNamespaces>
+    </plugin>
 </zend-config>
