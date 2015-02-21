@@ -11,6 +11,12 @@
             "email": "dominik@pfaffenbauer.at",
             "homepage": "http://www.pfaffenbauer.at/",
             "role": "Developer"
+        },
+        {
+            "name": "Rafal Galka",
+            "email": "rafal.galka@modernweb.pl",
+            "homepage": "http://www.modernweb.pl/",
+            "role": "Developer"
         }
     ],
     "require": {
