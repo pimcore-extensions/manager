@@ -56,19 +56,25 @@ pimcore.plugin.manager.search = Class.create({
                 dataIndex: 'description'
             },
             {
-                header: t('description'),
+                header: t('packagist'),
                 xtype: 'actioncolumn',
                 width: 30,
                 items: [{
-                    tooltip: t('description'),
-                    getClass: function(v, meta, rec) {
-                        return 'pimcore_action_column pimcore_icon_layout_region';
+                    tooltip: t('go_to_packagist'),
+                    getClass: function() {
+                        return 'pimcore_action_column manager_icon_link';
                     },
                     handler: function(grid, rowIndex) {
                         var rec = grid.getStore().getAt(rowIndex);
                         window.open(rec.get('url'));
                     }.bind(this)
                 }]
+            },
+            {
+                header: t('downloads'),
+                width: 30,
+                sortable: true,
+                dataIndex: 'downloads'
             },
             {
                 header: t('download'),
