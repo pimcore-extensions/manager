@@ -19,6 +19,19 @@ class Manager_Composer
         return false;
     }
 
+    public static function getDownloaded()
+    {
+        $downloaded = [];
+
+        $file = Manager_Composer::getComposerFile();
+        if (!$file)
+            return $downloaded;
+
+        $downloaded = json_decode(file_get_contents($file), true);
+
+        return $downloaded['require'];
+    }
+
     public static function requirePackage($package)
     {
         $jobId = uniqid();

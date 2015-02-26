@@ -11,8 +11,13 @@ class Manager_IndexController extends Pimcore_Controller_Action_Admin
         $results = $client->search('', ['type' => 'pimcore-plugin']);
         $packages = [];
 
+        $downloaded = Manager_Composer::getDownloaded();
+
         /** @var Packagist\Api\Result\Result $result */
         foreach ($results as $result) {
+            if (isset($downloaded[$result->getName()])) {
+                continue;
+            }
             $packages[] = [
                 'name' => $result->getName(),
                 'description' => $result->getDescription(),
