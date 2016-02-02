@@ -4,7 +4,7 @@ pimcore.plugin.manager.admin = Class.create(pimcore.extensionmanager.admin, {
     getGrid: function() {
         pimcore.plugin.manager.admin.superclass.prototype.getGrid.call(this)
 
-        this.grid.getTopToolbar().insert(3, {
+        this.grid.dockedItems.items[1].insert(3, {
             text: t('download_extension'),
             iconCls: 'pimcore_icon_plugin_add',
             handler: function() {

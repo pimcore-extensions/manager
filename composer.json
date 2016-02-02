@@ -22,7 +22,7 @@
     "require": {
         "pimcore/installer-plugin": ">=1",
         "composer/composer": "1.0.*@dev",
-        "symfony/console": "~2.6.0",
+        "symfony/console": "~3",
         "knplabs/packagist-api": "1.*@dev"
     },
     "autoload": {

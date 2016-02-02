@@ -6,8 +6,8 @@
         <pluginDescription><![CDATA[
             Helps you manage your Pimcore Extensions with Composer
         ]]></pluginDescription>
-        <pluginVersion>0.1.3</pluginVersion>
-        <pluginClassName>Manager_Plugin</pluginClassName>
+        <pluginVersion>0.1.4</pluginVersion>
+        <pluginClassName>\Manager\Plugin</pluginClassName>
         <pluginJsPaths>
             <path>/plugins/Manager/static/js/startup.js</path>
             <path>/plugins/Manager/static/js/manager/admin.js</path>

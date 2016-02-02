@@ -1,9 +1,15 @@
 <?php
 
-use Composer\Script\Event;
+namespace Manager;
 
-class Manager_Composer
+use Composer\Script\Event;
+use Pimcore\Tool\Console;
+
+class Composer
 {
+    /**
+     * @return bool|string
+     */
     public static function getComposerFile()
     {
         // first check composer one level above - as it's recommended in pimcore documentation:
@@ -19,11 +25,14 @@ class Manager_Composer
         return false;
     }
 
+    /**
+     * @return array|mixed
+     */
     public static function getDownloaded()
     {
         $downloaded = [];
 
-        $file = Manager_Composer::getComposerFile();
+        $file = self::getComposerFile();
         if (!$file)
             return $downloaded;
 
@@ -32,6 +41,10 @@ class Manager_Composer
         return $downloaded['require'];
     }
 
+    /**
+     * @param $package
+     * @return string
+     */
     public static function requirePackage($package)
     {
         $jobId = uniqid();
@@ -42,14 +55,18 @@ class Manager_Composer
             
         file_put_contents(self::getPidFile($jobId), $jobId);
 
-        $cmd = Pimcore_Tool_Console::getPhpCli() . ' ';
+        $cmd = Console::getPhpCli() . ' ';
         $cmd .= PIMCORE_PLUGINS_PATH . '/Manager/cli/composer-require.php ';
         $cmd .= $package . ' ' . $jobId;
-        Pimcore_Tool_Console::execInBackground($cmd, $logFile);
+        Console::execInBackground($cmd, $logFile);
 
         return $jobId;
     }
 
+    /**
+     * @param $jobId
+     * @return string
+     */
     public static function getStatus($jobId)
     {
         $pidFile = self::getPidFile($jobId);
@@ -61,16 +78,26 @@ class Manager_Composer
         return 'finished';
     }
 
+    /**
+     * @param $jobId
+     * @return string
+     */
     public static function getPidFile($jobId)
     {
         return PIMCORE_SYSTEM_TEMP_DIRECTORY . '/composer_update_' . $jobId . '.pid';
     }
 
+    /**
+     * @return string
+     */
     public static function getLogFile()
     {
         return PIMCORE_LOG_DIRECTORY . '/composer_update.log';
     }
 
+    /**
+     * @return null|string
+     */
     public static function getLog()
     {
         $file = self::getLogFile();
@@ -84,6 +111,9 @@ class Manager_Composer
         return null;
     }
 
+    /**
+     * @param Event $event
+     */
     public static function postInstall(Event $event)
     {
         echo "Setting permissions for pimcore-extensions/manager... ";
@@ -102,7 +132,7 @@ class Manager_Composer
         chmod($basePath . '/composer.lock', 0666);
 
         chmod($vendorPath, 0777);
-        $iterator = new IteratorIterator(new DirectoryIterator($vendorPath . '/composer'));
+        $iterator = new \IteratorIterator(new \DirectoryIterator($vendorPath . '/composer'));
         foreach($iterator as $item) {
             if ($item->isFile()) {
                 chmod($item->getPathName(), 0666);

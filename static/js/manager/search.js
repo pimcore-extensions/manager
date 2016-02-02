@@ -24,7 +24,7 @@ pimcore.plugin.manager.search = Class.create({
 
             var tabPanel = Ext.getCmp('pimcore_panel_tabs');
             tabPanel.add(this.panel);
-            tabPanel.activate('plugin_manager_search');
+            tabPanel.setActiveItem('plugin_manager_search');
 
             this.panel.on('destroy', function() {
                 pimcore.globalmanager.remove('plugin_manager_search');
@@ -37,28 +37,40 @@ pimcore.plugin.manager.search = Class.create({
     },
 
     getGrid: function() {
-        this.store = new Ext.data.JsonStore({
-            id: 'plugin_extensions',
-            url: '/plugin/Manager',
+        this.store = new Ext.data.Store({
             restful: false,
-            root: 'packages',
-            fields: ['name', 'description', 'url', 'downloads', 'favers', 'repository']
+            idProperty: 'id',
+            remoteSort: true,
+            fields : ['name', 'description', 'url', 'downloads', 'favers', 'repository'],
+            proxy: {
+                type: 'ajax',
+                url: '/plugin/Manager',
+                reader: {
+                    type: 'json',
+                    rootProperty : 'packages'
+                }
+            }
         });
+
         this.store.load();
 
         var typesColumns = [
-            {header: t('name'), width: 200, sortable: true, dataIndex: 'name'},
+            {
+                header: t('name'),
+                sortable: true,
+                dataIndex: 'name',
+                width : 250
+            },
             {
                 header: t('description'),
                 id: 'extension_description',
-                width: 200,
+                flex: 1,
                 sortable: true,
                 dataIndex: 'description'
             },
             {
-                header: t('packagist'),
                 xtype: 'actioncolumn',
-                width: 30,
+                width: 40,
                 items: [{
                     tooltip: t('go_to_packagist'),
                     getClass: function() {
@@ -72,14 +84,13 @@ pimcore.plugin.manager.search = Class.create({
             },
             {
                 header: t('downloads'),
-                width: 30,
+                width: 80,
                 sortable: true,
                 dataIndex: 'downloads'
             },
             {
-                header: t('download'),
                 xtype: 'actioncolumn',
-                width: 30,
+                width: 40,
                 items: [{
                     tooltip: t('download'),
                     getClass: function() {
@@ -191,7 +202,7 @@ pimcore.plugin.manager.search = Class.create({
         if (status.status == 'running') {
             window.setTimeout(this.fetchStatus.bind(this), 2000);
         } else {
-            this.downloadWindow.buttons[0].enable();
+            this.downloadWindow.getDockedItems()[1].items.items[0].enable();
         }
     }
 });

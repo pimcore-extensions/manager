@@ -1,17 +1,20 @@
 <?php
 
 use Packagist\Api\Result\Package\Version;
+use Packagist\Api\Client;
 
-class Manager_IndexController extends Pimcore_Controller_Action_Admin
+use Pimcore\Controller\Action\Admin;
+
+class Manager_IndexController extends Admin
 {
     public function indexAction()
     {
-        $client = new Packagist\Api\Client();
+        $client = new Client();
 
         $results = $client->search('', ['type' => 'pimcore-plugin']);
         $packages = [];
 
-        $downloaded = Manager_Composer::getDownloaded();
+        $downloaded = \Manager\Composer::getDownloaded();
 
         /** @var Packagist\Api\Result\Result $result */
         foreach ($results as $result) {
@@ -70,7 +73,7 @@ class Manager_IndexController extends Pimcore_Controller_Action_Admin
                 'message' => "no version for package with name '$name' not found"]);
 
         try {
-            $jobId = Manager_Composer::requirePackage($name . ':' . $version->getVersion());
+            $jobId = \Manager\Composer::requirePackage($name . ':' . $version->getVersion());
 
             return $this->_helper->json(['success' => true, 'jobId' => $jobId]);
         } catch (Exception $e) {
@@ -84,8 +87,8 @@ class Manager_IndexController extends Pimcore_Controller_Action_Admin
     {
         $jobId = $this->getParam('jobId');
 
-        $status = Manager_Composer::getStatus($jobId);
-        $log = Manager_Composer::getLog();
+        $status = \Manager\Composer::getStatus($jobId);
+        $log = \Manager\Composer::getLog();
 
         return $this->_helper->json(['status' => $status, 'log' => $log]);
     }

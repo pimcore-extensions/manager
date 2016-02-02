@@ -1,16 +1,29 @@
 <?php
 
-class Manager_Plugin extends Pimcore_API_Plugin_Abstract implements Pimcore_API_Plugin_Interface
+namespace Manager;
+
+use Pimcore\Api\Plugin as PimPlugin;
+
+class Plugin extends PimPlugin\AbstractPlugin implements PimPlugin\PluginInterface
 {
+    /**
+     * @return bool
+     */
     public static function isInstalled()
     {
         return true;
     }
 
+    /**
+     * Install routine
+     */
     public static function install()
     {
     }
 
+    /**
+     * Uninstall routine
+     */
     public static function uninstall()
     {
     }
