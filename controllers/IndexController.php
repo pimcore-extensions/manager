@@ -46,7 +46,7 @@ class Manager_IndexController extends Admin
         $client = new Packagist\Api\Client();
         try {
             $package = $client->get($name);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             return $this->_helper->json([
                 'success' => false,
                 'message' => "packagist package with name '$name' not found"]);
@@ -73,7 +73,7 @@ class Manager_IndexController extends Admin
                 'message' => "no version for package with name '$name' not found"]);
 
         try {
-            $jobId = \Manager\Composer::requirePackage($name . ':' . $version->getVersion());
+            $jobId = \Manager\Composer::installPackage($name . ':' . $version->getVersion());
 
             return $this->_helper->json(['success' => true, 'jobId' => $jobId]);
         } catch (Exception $e) {

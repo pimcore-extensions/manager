@@ -2,7 +2,7 @@
 
 namespace Manager;
 
-use Pimcore\Api\Plugin as PimPlugin;
+use Pimcore\API\Plugin as PimPlugin;
 
 class Plugin extends PimPlugin\AbstractPlugin implements PimPlugin\PluginInterface
 {
@@ -26,6 +26,22 @@ class Plugin extends PimPlugin\AbstractPlugin implements PimPlugin\PluginInterfa
      */
     public static function uninstall()
     {
+    }
+
+    /**
+     * Init Plugin.
+     */
+    public function init()
+    {
+        parent::init();
+
+        \Pimcore::getEventManager()->attach('system.console.init', function (\Zend_EventManager_Event $e) {
+            /** @var \Pimcore\Console\Application $application */
+            $application = $e->getTarget();
+
+            // add a namespace to autoload commands from
+            $application->addAutoloadNamespace('Manager\\Console', PIMCORE_PLUGINS_PATH . '/Manager/lib/Manager/Console');
+        });
     }
 
     /**

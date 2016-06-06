@@ -21,8 +21,6 @@
     ],
     "require": {
         "pimcore/installer-plugin": ">=1",
-        "composer/composer": "1.0.*@dev",
-        "symfony/console": "~3",
         "knplabs/packagist-api": "1.*@dev"
     },
     "autoload": {

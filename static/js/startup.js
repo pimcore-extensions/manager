@@ -9,11 +9,9 @@ pimcore.plugin.manager.startup = Class.create(pimcore.plugin.admin, {
         pimcore.plugin.broker.registerPlugin(this);
     },
     pimcoreReady: function (params,broker) {
-    
-    
         pimcore.globalmanager.get("layout_toolbar").extrasMenu.items.find(function(record) {
-            if(record.iconCls == 'pimcore_icon_extensionmanager')
-                record.setHandler(function(){
+            if(record.iconCls == 'pimcore_icon_plugin') {
+                record.setHandler(function () {
                     try {
                         pimcore.globalmanager.get("manager_admin").activate();
                     }
@@ -21,6 +19,7 @@ pimcore.plugin.manager.startup = Class.create(pimcore.plugin.admin, {
                         pimcore.globalmanager.add("manager_admin", new pimcore.plugin.manager.admin());
                     }
                 });
+            }
         }, this);
     }
 });
