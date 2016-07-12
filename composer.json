@@ -1,29 +1,34 @@
 {
-    "name": "pimcore-extensions/manager",
-    "type": "pimcore-plugin",
-    "license": "Simple BSD",
-    "description": "Helps you manage your Pimcore Extensions with Composer",
-    "keywords": ["pimcore", "extensionmanager"],
-    "homepage": "https://github.com/pimcore-extensions/manager",
-    "authors": [
-        {
-            "name": "Dominik Pfaffenbauer",
-            "email": "dominik@pfaffenbauer.at",
-            "homepage": "http://www.pfaffenbauer.at/",
-            "role": "Developer"
-        },
-        {
-            "name": "Rafal Galka",
-            "email": "rafal.galka@modernweb.pl",
-            "homepage": "http://www.modernweb.pl/",
-            "role": "Developer"
-        }
-    ],
-    "require": {
-        "pimcore/installer-plugin": ">=1",
-        "knplabs/packagist-api": "1.*@dev"
+  "name": "pimcore-extensions/manager",
+  "type": "pimcore-plugin",
+  "license": "Simple BSD",
+  "description": "Helps you manage your Pimcore Extensions with Composer",
+  "keywords": [
+    "pimcore",
+    "extensionmanager"
+  ],
+  "homepage": "https://github.com/pimcore-extensions/manager",
+  "authors": [
+    {
+      "name": "Dominik Pfaffenbauer",
+      "email": "dominik@pfaffenbauer.at",
+      "homepage": "http://www.pfaffenbauer.at/",
+      "role": "Developer"
     },
-    "autoload": {
-        "psr-0": {"Manager_": "lib/"}
+    {
+      "name": "Rafal Galka",
+      "email": "rafal.galka@modernweb.pl",
+      "homepage": "http://www.modernweb.pl/",
+      "role": "Developer"
     }
+  ],
+  "require": {
+    "pimcore/installer-plugin": ">=1",
+    "knplabs/packagist-api": "1.*@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "Manager\\": "lib/Manager"
+    }
+  }
 }

@@ -2,7 +2,6 @@
 
 namespace Manager;
 
-use Composer\Script\Event;
 use Pimcore\Tool\Console;
 
 class Composer
@@ -39,22 +38,33 @@ class Composer
     /**
      * @param $package
      * @return string
-     *
      * @throws \Exception
      */
     public static function installPackage($package)
     {
-        $jobId = uniqid();
         $logFile = self::getLogFile();
+        $jobId = uniqid();
+        $pidFile = self::getPidFile($jobId);
+
+        $console = implode(DIRECTORY_SEPARATOR, [
+            PIMCORE_PATH,
+            'cli',
+            'console.php'
+        ]);
+        $cmd = implode(' ', [
+            Console::getPhpCli(),
+            $console,
+            'manager:require',
+            '-p ' . $pidFile,
+            '-r ' . $package
+        ]);
 
         if (is_file($logFile))
             unlink($logFile);
-            
-        file_put_contents(self::getPidFile($jobId), $jobId);
+        file_put_contents($pidFile, $jobId);
 
-        $cmd = Console::getPhpCli() . " " . realpath(PIMCORE_PATH . DIRECTORY_SEPARATOR . "cli" . DIRECTORY_SEPARATOR . "console.php"). " manager:require -p " . self::getPidFile($jobId) . " -r " . $package;
         Console::execInBackground($cmd, $logFile);
-        
+
         return $jobId;
     }
 
@@ -99,8 +109,7 @@ class Composer
 
         if (is_file($file)) {
             $content = file_get_contents($file);
-            $content = preg_replace('~[[:cntrl:]]+~', "\n", $content);
-            return nl2br($content, false);
+            return nl2br($content);
         }
 
         return null;

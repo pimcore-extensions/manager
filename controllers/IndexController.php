@@ -70,7 +70,7 @@ class Manager_IndexController extends Admin
         if (!$version instanceof Version)
             return $this->_helper->json([
                 'success' => false,
-                'message' => "no version for package with name '$name' not found"]);
+                'message' => "no version found for package '$name'"]);
 
         try {
             $jobId = \Manager\Composer::installPackage($name . ':' . $version->getVersion());
@@ -85,11 +85,9 @@ class Manager_IndexController extends Admin
 
     public function statusAction()
     {
-        $jobId = $this->getParam('jobId');
-
-        $status = \Manager\Composer::getStatus($jobId);
-        $log = \Manager\Composer::getLog();
-
-        return $this->_helper->json(['status' => $status, 'log' => $log]);
+        return $this->_helper->json([
+            'status' => \Manager\Composer::getStatus($this->getParam('jobId')),
+            'log' => \Manager\Composer::getLog(),
+        ]);
     }
 }
