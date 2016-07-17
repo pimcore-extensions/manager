@@ -1,16 +1,16 @@
 pimcore.registerNS('pimcore.plugin.manager.search');
 pimcore.plugin.manager.search = Class.create({
 
-    initialize: function() {
+    initialize: function () {
         this.getTabPanel();
     },
 
-    activate: function() {
+    activate: function () {
         var tabPanel = Ext.getCmp('pimcore_panel_tabs');
-        tabPanel.activate('plugin_manager_search');
+        tabPanel.setActiveItem('plugin_manager_search');
     },
 
-    getTabPanel: function() {
+    getTabPanel: function () {
         if (!this.panel) {
             this.panel = new Ext.Panel({
                 id: 'plugin_manager_search',
@@ -26,7 +26,7 @@ pimcore.plugin.manager.search = Class.create({
             tabPanel.add(this.panel);
             tabPanel.setActiveItem('plugin_manager_search');
 
-            this.panel.on('destroy', function() {
+            this.panel.on('destroy', function () {
                 pimcore.globalmanager.remove('plugin_manager_search');
             }.bind(this));
 
@@ -36,18 +36,18 @@ pimcore.plugin.manager.search = Class.create({
         return this.panel;
     },
 
-    getGrid: function() {
+    getGrid: function () {
         this.store = new Ext.data.Store({
             restful: false,
             idProperty: 'id',
             remoteSort: true,
-            fields : ['name', 'description', 'url', 'downloads', 'favers', 'repository'],
+            fields: ['name', 'description', 'url', 'downloads', 'favers', 'repository'],
             proxy: {
                 type: 'ajax',
                 url: '/plugin/Manager',
                 reader: {
                     type: 'json',
-                    rootProperty : 'packages'
+                    rootProperty: 'packages'
                 }
             }
         });
@@ -59,7 +59,7 @@ pimcore.plugin.manager.search = Class.create({
                 header: t('name'),
                 sortable: true,
                 dataIndex: 'name',
-                width : 250
+                width: 250
             },
             {
                 header: t('description'),
@@ -73,10 +73,10 @@ pimcore.plugin.manager.search = Class.create({
                 width: 40,
                 items: [{
                     tooltip: t('go_to_packagist'),
-                    getClass: function() {
+                    getClass: function () {
                         return 'pimcore_action_column manager_icon_link';
                     },
-                    handler: function(grid, rowIndex) {
+                    handler: function (grid, rowIndex) {
                         var rec = grid.getStore().getAt(rowIndex);
                         window.open(rec.get('url'));
                     }.bind(this)
@@ -93,10 +93,10 @@ pimcore.plugin.manager.search = Class.create({
                 width: 40,
                 items: [{
                     tooltip: t('download'),
-                    getClass: function() {
+                    getClass: function () {
                         return 'pimcore_action_column pimcore_icon_download';
                     },
-                    handler: function(grid, rowIndex) {
+                    handler: function (grid, rowIndex) {
                         var rec = grid.getStore().getAt(rowIndex);
                         this.openDownloadWindow(rec);
                     }.bind(this)
@@ -126,11 +126,11 @@ pimcore.plugin.manager.search = Class.create({
         return this.grid;
     },
 
-    reload: function() {
+    reload: function () {
         this.store.reload();
     },
 
-    openDownloadWindow: function(rec) {
+    openDownloadWindow: function (rec) {
         this.downloadWindow = new Ext.Window({
             modal: true,
             title: t('plugin_manager_install'),
@@ -147,7 +147,7 @@ pimcore.plugin.manager.search = Class.create({
                 text: t('close'),
                 iconCls: 'pimcore_icon_apply',
                 disabled: true,
-                handler: function() {
+                handler: function () {
                     this.downloadWindow.close();
                 }.bind(this)
             }],
@@ -161,7 +161,7 @@ pimcore.plugin.manager.search = Class.create({
         this.downloadPrepare(rec);
     },
 
-    downloadPrepare: function(rec) {
+    downloadPrepare: function (rec) {
         Ext.Ajax.request({
             url: '/plugin/Manager/index/install',
             params: {
@@ -171,7 +171,7 @@ pimcore.plugin.manager.search = Class.create({
         });
     },
 
-    downloadStarted: function(transport) {
+    downloadStarted: function (transport) {
         var info = Ext.decode(transport.responseText);
 
         if (info.success) {
@@ -181,7 +181,7 @@ pimcore.plugin.manager.search = Class.create({
         }
     },
 
-    fetchStatus: function() {
+    fetchStatus: function () {
         Ext.Ajax.request({
             url: '/plugin/Manager/index/status',
             params: {
@@ -191,7 +191,7 @@ pimcore.plugin.manager.search = Class.create({
         });
     },
 
-    updateStatus: function(transport) {
+    updateStatus: function (transport) {
         var status = Ext.decode(transport.responseText);
 
         var log = this.downloadWindow.items.get(0);
