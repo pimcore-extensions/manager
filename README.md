@@ -35,11 +35,13 @@ dependency management (not one level above document-root as suggested in
 
 # CHANGELOG
 
-* 0.3.0 (2016-07-17)
+* **0.3.1** (2016-07-17)
+    * fix reload after package install
+* **0.3.0** (2016-07-17)
     * sort available packages (by name, description, downloads, stars)
     * added search/filter field
     * added pagination
-* 0.2.0 (2016-07-17)
+* **0.2.0** (2016-07-17)
     * Compatibility with pimcore 4.1.3
     * CLI command to set required permissions
     * Improved error handling
