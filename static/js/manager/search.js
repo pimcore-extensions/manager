@@ -15,7 +15,7 @@ pimcore.plugin.manager.search = Class.create({
             this.panel = new Ext.Panel({
                 id: 'plugin_manager_search',
                 title: t('download_extension'),
-                iconCls: 'pimcore_icon_plugin_add',
+                iconCls: 'pimcore_icon_plugin pimcore_icon_overlay_download',
                 border: false,
                 layout: 'fit',
                 closable: true,
