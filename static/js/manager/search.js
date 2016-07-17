@@ -37,26 +37,37 @@ pimcore.plugin.manager.search = Class.create({
     },
 
     getGrid: function () {
-        this.store = new Ext.data.Store({
-            restful: false,
-            idProperty: 'id',
-            remoteSort: true,
+        this.store = pimcore.helpers.grid.buildDefaultStore('/plugin/Manager', [
+            'name',
+            'description',
+            'url',
+            'downloads',
+            'favers',
+            'repository'
+        ], pimcore.helpers.grid.getDefaultPageSize(), {
             sorters: [{
                 property: 'downloads',
                 direction: 'DESC'
-            }],
-            fields: ['name', 'description', 'url', 'downloads', 'favers', 'repository'],
-            proxy: {
-                type: 'ajax',
-                url: '/plugin/Manager',
-                reader: {
-                    type: 'json',
-                    rootProperty: 'packages'
-                }
+            }]
+        });
+        this.pagingtoolbar = pimcore.helpers.grid.buildDefaultPagingToolbar(this.store);
+
+        this.filterField = new Ext.form.TextField({
+            xtype: 'textfield',
+            width: 200,
+            style: 'margin: 0 10px 0 0;',
+            enableKeyEvents: true,
+            listeners: {
+                'keydown': function (field, key) {
+                    if (key.getKey() == key.ENTER) {
+                        var input = field;
+                        var proxy = this.store.getProxy();
+                        proxy.extraParams.filter = input.getValue();
+                        this.store.load();
+                    }
+                }.bind(this)
             }
         });
-
-        this.store.load();
 
         var typesColumns = [{
             header: t('name'),
@@ -116,21 +127,18 @@ pimcore.plugin.manager.search = Class.create({
             trackMouseOver: true,
             columnLines: true,
             stripeRows: true,
-            tbar: [{
-                text: t('refresh'),
-                iconCls: 'pimcore_icon_reload',
-                handler: this.reload.bind(this)
-            }],
+            tbar: ['->', {
+                text: t('filter') + '/' + t('search'),
+                xtype: 'tbtext',
+                style: 'margin: 0 10px 0 0;'
+            }, this.filterField],
+            bbar: this.pagingtoolbar,
             viewConfig: {
                 forceFit: true
             }
         });
 
         return this.grid;
-    },
-
-    reload: function () {
-        this.store.reload();
     },
 
     openDownloadWindow: function (rec) {

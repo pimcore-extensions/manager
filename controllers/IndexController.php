@@ -32,11 +32,14 @@ class Manager_IndexController extends Admin
         // for array_multisort
         $sorter = [];
 
+        $filter = trim($this->getParam('filter'));
+
         /** @var Packagist\Api\Result\Result $result */
         foreach ($results as $result) {
             if (isset($downloaded[$result->getName()])) {
                 continue;
             }
+
             $package = [
                 'name' => $result->getName(),
                 'description' => $result->getDescription(),
@@ -45,13 +48,31 @@ class Manager_IndexController extends Admin
                 'favers' => $result->getFavers(),
                 'repository' => $result->getRepository()
             ];
+
+            if ($filter &&
+                strpos($package['name'], $filter) === false &&
+                strpos($package['description'], $filter) === false) {
+                continue;
+            }
+
             $packages[] = $package;
             $sorter[] = $package[$sort['property']];
         }
 
         array_multisort($sorter, $direction, $packages);
 
-        $this->_helper->json(['success' => true, 'packages' => $packages]);
+        $total = count($packages);
+        $start = (int)$this->getParam('start');
+        $limit = (int)$this->getParam('limit');
+        if ($start > 0 || ($start + $limit) < $total) {
+            $packages = array_slice($packages, $start, $limit);
+        }
+
+        $this->_helper->json([
+            'data' => $packages,
+            'success' => true,
+            'total' => $total,
+        ]);
     }
 
     public function installAction()
