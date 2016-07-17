@@ -16,20 +16,28 @@ class Manager_IndexController extends Admin
 
         $downloaded = \Manager\Composer::getDownloaded();
 
+        $sortable = ['name', 'description', 'downloads', 'favers'];
+        $sort = [];
+        if ($this->getParam('sort')) {
+            $sort = json_decode($this->getParam('sort'), true);
+            if (is_array($sort) && !empty($sort)) {
+                $sort = $sort[0];
+            }
+        }
+        if (!in_array($sort['property'], $sortable)) {
+            $sort['property'] = 'downloads';
+        }
+        $direction = strtoupper($sort['direction']) === 'ASC' ? SORT_ASC : SORT_DESC;
+
         // for array_multisort
-        $sorters = [
-            'name' => [],
-            'description' => [],
-            'downloads' => [],
-            'favers' => [],
-        ];
+        $sorter = [];
 
         /** @var Packagist\Api\Result\Result $result */
         foreach ($results as $result) {
             if (isset($downloaded[$result->getName()])) {
                 continue;
             }
-            $packages[] = [
+            $package = [
                 'name' => $result->getName(),
                 'description' => $result->getDescription(),
                 'url' => $result->getUrl(),
@@ -37,26 +45,11 @@ class Manager_IndexController extends Admin
                 'favers' => $result->getFavers(),
                 'repository' => $result->getRepository()
             ];
-            $sorters['name'][] = $result->getName();
-            $sorters['description'][] = $result->getDescription();
-            $sorters['downloads'][] = $result->getDownloads();
-            $sorters['favers'][] = $result->getFavers();
+            $packages[] = $package;
+            $sorter[] = $package[$sort['property']];
         }
 
-        $sort = [
-            'property' => 'downloads',
-            'direction' => 'DESC',
-        ];
-        if ($this->getParam('sort')) {
-            $sort = json_decode($this->getParam('sort'), true)[0];
-        }
-
-        $sortArray = &$sorters['name'];
-        if (isset($sorters[$sort['property']]))
-            $sortArray = &$sorters[$sort['property']];
-        $direction = strtoupper($sort['direction']) === 'ASC' ? SORT_ASC : SORT_DESC;
-
-        array_multisort($sortArray, $direction, $packages);
+        array_multisort($sorter, $direction, $packages);
 
         $this->_helper->json(['success' => true, 'packages' => $packages]);
     }
