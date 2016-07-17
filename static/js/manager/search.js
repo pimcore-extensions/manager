@@ -41,6 +41,10 @@ pimcore.plugin.manager.search = Class.create({
             restful: false,
             idProperty: 'id',
             remoteSort: true,
+            sorters: [{
+                property: 'downloads',
+                direction: 'DESC'
+            }],
             fields: ['name', 'description', 'url', 'downloads', 'favers', 'repository'],
             proxy: {
                 type: 'ajax',
@@ -54,55 +58,54 @@ pimcore.plugin.manager.search = Class.create({
 
         this.store.load();
 
-        var typesColumns = [
-            {
-                header: t('name'),
-                sortable: true,
-                dataIndex: 'name',
-                width: 250
-            },
-            {
-                header: t('description'),
-                id: 'extension_description',
-                flex: 1,
-                sortable: true,
-                dataIndex: 'description'
-            },
-            {
-                xtype: 'actioncolumn',
-                width: 40,
-                items: [{
-                    tooltip: t('go_to_packagist'),
-                    getClass: function () {
-                        return 'pimcore_action_column manager_icon_link';
-                    },
-                    handler: function (grid, rowIndex) {
-                        var rec = grid.getStore().getAt(rowIndex);
-                        window.open(rec.get('url'));
-                    }.bind(this)
-                }]
-            },
-            {
-                header: t('downloads'),
-                width: 80,
-                sortable: true,
-                dataIndex: 'downloads'
-            },
-            {
-                xtype: 'actioncolumn',
-                width: 40,
-                items: [{
-                    tooltip: t('download'),
-                    getClass: function () {
-                        return 'pimcore_action_column pimcore_icon_download';
-                    },
-                    handler: function (grid, rowIndex) {
-                        var rec = grid.getStore().getAt(rowIndex);
-                        this.openDownloadWindow(rec);
-                    }.bind(this)
-                }]
-            }
-        ];
+        var typesColumns = [{
+            header: t('name'),
+            sortable: true,
+            dataIndex: 'name',
+            width: 250
+        }, {
+            header: t('description'),
+            id: 'extension_description',
+            flex: 1,
+            sortable: true,
+            dataIndex: 'description'
+        }, {
+            xtype: 'actioncolumn',
+            width: 40,
+            items: [{
+                tooltip: t('go_to_packagist'),
+                getClass: function () {
+                    return 'pimcore_action_column manager_icon_link';
+                },
+                handler: function (grid, rowIndex) {
+                    var rec = grid.getStore().getAt(rowIndex);
+                    window.open(rec.get('url'));
+                }.bind(this)
+            }]
+        }, {
+            header: t('downloads'),
+            width: 100,
+            sortable: true,
+            dataIndex: 'downloads'
+        }, {
+            header: t('stars'),
+            width: 80,
+            sortable: true,
+            dataIndex: 'favers'
+        }, {
+            xtype: 'actioncolumn',
+            width: 40,
+            items: [{
+                tooltip: t('download'),
+                getClass: function () {
+                    return 'pimcore_action_column pimcore_icon_download';
+                },
+                handler: function (grid, rowIndex) {
+                    var rec = grid.getStore().getAt(rowIndex);
+                    this.openDownloadWindow(rec);
+                }.bind(this)
+            }]
+        }];
 
         this.grid = new Ext.grid.GridPanel({
             frame: false,

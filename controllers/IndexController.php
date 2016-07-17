@@ -16,6 +16,14 @@ class Manager_IndexController extends Admin
 
         $downloaded = \Manager\Composer::getDownloaded();
 
+        // for array_multisort
+        $sorters = [
+            'name' => [],
+            'description' => [],
+            'downloads' => [],
+            'favers' => [],
+        ];
+
         /** @var Packagist\Api\Result\Result $result */
         foreach ($results as $result) {
             if (isset($downloaded[$result->getName()])) {
@@ -29,7 +37,26 @@ class Manager_IndexController extends Admin
                 'favers' => $result->getFavers(),
                 'repository' => $result->getRepository()
             ];
+            $sorters['name'][] = $result->getName();
+            $sorters['description'][] = $result->getDescription();
+            $sorters['downloads'][] = $result->getDownloads();
+            $sorters['favers'][] = $result->getFavers();
         }
+
+        $sort = [
+            'property' => 'downloads',
+            'direction' => 'DESC',
+        ];
+        if ($this->getParam('sort')) {
+            $sort = json_decode($this->getParam('sort'), true)[0];
+        }
+
+        $sortArray = &$sorters['name'];
+        if (isset($sorters[$sort['property']]))
+            $sortArray = &$sorters[$sort['property']];
+        $direction = strtoupper($sort['direction']) === 'ASC' ? SORT_ASC : SORT_DESC;
+
+        array_multisort($sortArray, $direction, $packages);
 
         $this->_helper->json(['success' => true, 'packages' => $packages]);
     }
