@@ -163,7 +163,9 @@ pimcore.plugin.manager.search = Class.create({
                 }.bind(this)
             }],
             listeners: {
-                close: this.reload.bind(this)
+                close: function() {
+                    this.store.reload();
+                }.bind(this)
             }
         });
 
