@@ -1,3 +1,6 @@
+This plugin is not maintaned for a long time. Pimcore 5 now totally depends on composer and therefore this is not needed anymore. If you still see it usefull and have any fixes, feel free to submit a pull request!
+
+
 # Extensions Manager for [pimcore](http://www.pimcore.org/) #
 
 Manage your Pimcore Extensions with [Composer][1] directly from admin panel.
